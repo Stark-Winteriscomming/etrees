@@ -1,12 +1,13 @@
 package com.spring.board.controller;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
-import org.codehaus.jackson.JsonProcessingException;
+import javax.servlet.http.HttpServletRequest;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,12 +18,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
 import com.spring.board.HomeController;
 import com.spring.board.service.boardService;
 import com.spring.board.vo.BoardVo;
+import com.spring.board.vo.Options;
 import com.spring.board.vo.PageVo;
 import com.spring.common.CommonUtil;
 
@@ -35,9 +35,17 @@ public class BoardController {
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 	
 	@RequestMapping(value = "/board/boardList.do", method = RequestMethod.GET)
-	public String boardList(Locale locale, Model model,PageVo pageVo) throws Exception{
-		logger.info("ggggggggggggggg");
+	public String boardList(HttpServletRequest req, Locale locale, Model model,PageVo pageVo, @RequestParam Map<String, Object> map) throws Exception{
 		List<BoardVo> boardList = new ArrayList<BoardVo>();
+		String options[] = req.getParameterValues("option");
+		Map<String, String> m = new HashMap<String, String>();
+		int i = 0;
+		for (String key : options)
+			  m.put(key, options[i++]);
+		
+		final ObjectMapper mapper = new ObjectMapper(); // jackson's objectmapper
+		final Options os = mapper.convertValue(m, Options.class);
+		logger.info(">>>>>" + os.toString());
 		
 		int page = 1;
 		int totalCnt = 0;
@@ -81,7 +89,7 @@ public class BoardController {
 	}
 	
 	@RequestMapping(value = "/board/boardWriteAction.do", method = RequestMethod.POST)
-	@ResponseBody
+	//@ResponseBody
 	public String boardWriteAction(Locale locale,BoardVo boardVo) throws Exception{
 		
 		HashMap<String, String> result = new HashMap<String, String>();
